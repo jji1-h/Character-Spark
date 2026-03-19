@@ -68,21 +68,28 @@ class CharacterCards extends HTMLElement {
 
     this.shadowRoot.innerHTML = `
       <style>
-        :host { display: block; width: 100%; }
+        :host { 
+          display: block; 
+          width: 100%; 
+          font-family: 'Pretendard Variable', Pretendard, sans-serif;
+        }
         .grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 1.5rem;
+          gap: 2rem;
           perspective: 2000px;
           width: 100%;
+          max-width: 1200px;
+          margin: 0 auto;
         }
-        @media (max-width: 900px) {
+        @media (max-width: 1000px) {
           .grid {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(2, 2fr);
+            gap: 1.5rem;
           }
         }
         .card-scene {
-          aspect-ratio: 2/3.5;
+          aspect-ratio: 2/3.2;
           cursor: pointer;
         }
         .card {
@@ -104,32 +111,16 @@ class CharacterCards extends HTMLElement {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          border-radius: 1rem;
-          border: 2px solid var(--accent-color, #FFD700);
-          box-shadow: 0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(255, 215, 0, 0.2);
+          border-radius: 1.2rem;
+          border: 2px solid #FFD700;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.5);
           overflow: hidden;
-        }
-        .face::before {
-          content: '';
-          position: absolute;
-          inset: 5px;
-          border: 1px solid rgba(255, 215, 0, 0.3);
-          border-radius: 0.8rem;
-          pointer-events: none;
+          /* Ensure same size by using box-sizing and explicit dimensions if needed */
+          box-sizing: border-box;
         }
         .front {
           background: linear-gradient(135deg, #25163F, #3B167C);
-          color: var(--accent-color, #FFD700);
-        }
-        .front .ornament {
-          position: absolute;
-          width: 80%;
-          height: 80%;
-          border: 1px solid rgba(255, 215, 0, 0.1);
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
+          color: #FFD700;
         }
         .back {
           background: #FFFFFF;
@@ -137,38 +128,32 @@ class CharacterCards extends HTMLElement {
           transform: rotateY(180deg);
           padding: 1.5rem;
           text-align: center;
-          font-family: 'Georgia', serif;
         }
         .result-text {
-          font-weight: 900;
-          font-size: clamp(1rem, 2vw, 1.5rem);
-          line-height: 1.2;
-          margin-bottom: 1rem;
+          font-weight: 800;
+          font-size: clamp(1.1rem, 2vw, 1.4rem);
+          line-height: 1.4;
+          word-break: keep-all;
         }
         .card-footer {
           position: absolute;
           bottom: 1.5rem;
-          font-size: 0.7rem;
-          letter-spacing: 0.3em;
-          font-weight: 800;
-          opacity: 0.6;
+          font-size: 0.75rem;
+          letter-spacing: 0.2em;
+          font-weight: 700;
+          opacity: 0.5;
         }
-        .icon { font-size: 3rem; margin-bottom: 1rem; text-shadow: 0 0 15px var(--accent-glow); }
-        .cat-label { font-weight: 900; letter-spacing: 0.4em; font-size: 0.7rem; }
+        .icon { font-size: 3.5rem; margin-bottom: 1.5rem; }
+        .cat-label { font-weight: 800; letter-spacing: 0.3em; font-size: 0.8rem; }
         
         .hint {
           text-align: center;
           margin-top: 3rem;
-          font-size: 0.8rem;
-          color: var(--accent-color);
+          font-size: 0.9rem;
+          color: #FFD700;
           text-transform: uppercase;
-          letter-spacing: 0.3em;
-          opacity: 0.8;
-          animation: pulse 2s infinite;
-        }
-        @keyframes pulse {
-          0%, 100% { opacity: 0.5; }
-          50% { opacity: 1; }
+          letter-spacing: 0.2em;
+          font-weight: 700;
         }
       </style>
       <div class="grid">
@@ -176,7 +161,6 @@ class CharacterCards extends HTMLElement {
           <div class="card-scene" data-id="${cat.id}">
             <div class="card" data-cat="${cat.id}">
               <div class="face front">
-                <div class="ornament"></div>
                 <div class="icon">${cat.icon}</div>
                 <div class="cat-label">${cat.label}</div>
               </div>
@@ -187,7 +171,7 @@ class CharacterCards extends HTMLElement {
           </div>
         `).join('')}
       </div>
-      <div class="hint">Click to reveal your magical fate</div>
+      <div class="hint">Click each card to reveal your character spark</div>
     `;
 
     this.shadowRoot.querySelectorAll('.card-scene').forEach(scene => {

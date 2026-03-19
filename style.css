@@ -11,7 +11,7 @@
     --surface-color: rgba(37, 22, 63, 0.7);
     --border-color: rgba(255, 215, 0, 0.2);
     
-    --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+    --font-main: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, 'Helvetica Neue', 'Segoe UI', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', sans-serif;
   }
 
   * {
@@ -57,6 +57,7 @@
     letter-spacing: 0.1em;
     margin-bottom: 0.5rem;
     color: var(--accent-color);
+    /* Removed text gradient as requested */
     text-shadow: 0 0 20px var(--accent-glow);
   }
 
@@ -115,6 +116,7 @@
     box-shadow: 0 0 30px var(--accent-glow);
     text-transform: uppercase;
     letter-spacing: 0.2em;
+    font-family: var(--font-main);
   }
 
   .primary-btn:hover:not(:disabled) {
