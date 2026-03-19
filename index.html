@@ -1,14 +1,75 @@
 <!doctype html>
-<html lang="en">
+<html lang="ko">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Hello World</title>
-  <link href='/style.css' rel='stylesheet'>
+  <title>Character Spark | 캐릭터 스파크</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Three.js for visual effects -->
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js"
+      }
+    }
+  </script>
 </head>
 <body>
-  <h1>Hello, world!</h1>
-  <button onclick="console.log('hello');">Press me</button>
-  <script defer type="text/javascript" src="/main.js"></script>
+  <div id="app">
+    <header>
+      <h1>Character Spark <span>캐릭터 스파크</span></h1>
+      <p>창작자를 위한 캐릭터 영감 엔진</p>
+    </header>
+
+    <main>
+      <section class="generator-area">
+        <div class="controls">
+          <genre-switcher></genre-switcher>
+        </div>
+        
+        <character-slot-machine></character-slot-machine>
+        
+        <div class="action-buttons">
+          <button id="spark-btn" class="primary-btn">SPARK! (영감 얻기)</button>
+          <button id="save-btn" class="secondary-btn" disabled>SAVE (보관하기)</button>
+        </div>
+      </section>
+
+      <section class="visual-area">
+        <mood-board></mood-board>
+      </section>
+
+      <section class="storage-area">
+        <h2>My Sparks (보관함)</h2>
+        <my-spark-shelf></my-spark-shelf>
+      </section>
+    </main>
+
+    <footer>
+      <p>&copy; 2024 Character Spark. Create something amazing.</p>
+    </footer>
+  </div>
+
+  <script type="module">
+    import './main.js';
+    import './components/GenreSwitcher.js';
+    import './components/SlotMachine.js';
+    import './components/MoodBoard.js';
+    import './components/SparkShelf.js';
+    
+    // Global event listener for Spark button
+    document.getElementById('spark-btn').addEventListener('click', () => {
+      document.querySelector('character-slot-machine').spin();
+    });
+
+    document.getElementById('save-btn').addEventListener('click', () => {
+      document.querySelector('character-slot-machine').saveCurrent();
+    });
+
+    // Listen for spin completion to enable save button
+    window.addEventListener('spark-complete', () => {
+      document.getElementById('save-btn').disabled = false;
+    });
+  </script>
 </body>
 </html>

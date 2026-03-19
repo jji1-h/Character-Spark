@@ -1,1 +1,151 @@
-/* Add styles here */
+@layer base, layout, components, utilities;
+
+@layer base {
+  :root {
+    --bg-color: oklch(15% 0.02 250);
+    --text-color: oklch(95% 0.01 250);
+    --accent-color: oklch(75% 0.15 250);
+    --accent-glow: oklch(75% 0.15 250 / 0.3);
+    --secondary-color: oklch(65% 0.12 300);
+    --surface-color: oklch(20% 0.03 250);
+    --border-color: oklch(30% 0.04 250);
+    
+    --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    background-color: var(--bg-color);
+    color: var(--text-color);
+    font-family: var(--font-main);
+    line-height: 1.6;
+    overflow-x: hidden;
+    background-image: radial-gradient(circle at top right, oklch(25% 0.05 280 / 0.5), transparent);
+  }
+
+  h1, h2, h3 {
+    line-height: 1.1;
+    font-weight: 800;
+  }
+}
+
+@layer layout {
+  #app {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 3rem;
+    min-height: 100vh;
+    container-type: inline-size;
+  }
+
+  header {
+    text-align: center;
+    padding-block: 2rem;
+  }
+
+  header h1 {
+    font-size: clamp(2.5rem, 8vw, 4rem);
+    text-transform: uppercase;
+    letter-spacing: -0.05em;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(to right, var(--accent-color), var(--secondary-color));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  header h1 span {
+    display: block;
+    font-size: 0.4em;
+    font-weight: 400;
+    letter-spacing: 0.1em;
+    -webkit-text-fill-color: var(--text-color);
+    opacity: 0.7;
+  }
+
+  main {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 3rem;
+  }
+
+  @container (min-width: 800px) {
+    main {
+      grid-template-columns: 1.5fr 1fr;
+    }
+  }
+
+  .generator-area {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    container-type: inline-size;
+  }
+
+  .visual-area {
+    background: var(--surface-color);
+    border-radius: 2rem;
+    padding: 1.5rem;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 20px 40px -10px black;
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+}
+
+@layer components {
+  .primary-btn {
+    background: var(--accent-color);
+    color: var(--bg-color);
+    border: none;
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    border-radius: 1rem;
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 0 20px var(--accent-glow);
+  }
+
+  .primary-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 0 0 30px var(--accent-glow);
+  }
+
+  .secondary-btn {
+    background: transparent;
+    color: var(--text-color);
+    border: 2px solid var(--border-color);
+    padding: 1rem 2rem;
+    font-size: 1.2rem;
+    font-weight: 700;
+    border-radius: 1rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .secondary-btn:not(:disabled):hover {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+  }
+
+  .secondary-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+  }
+}
