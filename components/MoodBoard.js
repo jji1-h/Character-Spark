@@ -75,10 +75,13 @@ class MoodBoard extends HTMLElement {
     // Update 3D mesh based on genre and first color
     this.scene.remove(this.mesh);
     let geometry;
-    switch(spark.genre) {
+    const primaryGenre = (spark.genres && spark.genres[0]) || spark.genre;
+    
+    switch(primaryGenre) {
       case 'fantasy': geometry = new THREE.OctahedronGeometry(1, 0); break;
       case 'scifi': geometry = new THREE.TorusKnotGeometry(0.7, 0.2, 100, 16); break;
       case 'romance': geometry = new THREE.TorusGeometry(0.8, 0.3, 16, 100); break;
+      case 'daily': geometry = new THREE.BoxGeometry(1, 1, 1); break;
       default: geometry = new THREE.IcosahedronGeometry(1, 0);
     }
     

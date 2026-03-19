@@ -52,11 +52,35 @@ class SparkShelf extends HTMLElement {
           padding: 0.5rem;
           line-height: 1;
         }
-        .card-title {
-          font-size: 0.9rem;
+        .card-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          margin-bottom: 0.5rem;
+          gap: 0.5rem;
+        }
+        .genre-badges {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.3rem;
+        }
+        .genre-badge {
+          font-size: 0.55rem;
+          background: oklch(40% 0.05 250);
+          padding: 0.15rem 0.4rem;
+          border-radius: 0.3rem;
           text-transform: uppercase;
-          letter-spacing: 0.1em;
-          color: oklch(60% 0.05 250);
+          color: oklch(90% 0.01 250);
+        }
+        .mini-palette {
+          display: flex;
+          gap: 3px;
+        }
+        .mini-palette div {
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          border: 1px solid rgba(255,255,255,0.2);
         }
         .keywords {
           display: flex;
@@ -81,29 +105,6 @@ class SparkShelf extends HTMLElement {
           border: 2px dashed oklch(30% 0.02 250);
           border-radius: 1rem;
         }
-        .genre-badge {
-          display: inline-block;
-          font-size: 0.6rem;
-          background: oklch(40% 0.05 250);
-          padding: 0.2rem 0.5rem;
-          border-radius: 0.4rem;
-        }
-        .card-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 0.5rem;
-        }
-        .mini-palette {
-          display: flex;
-          gap: 3px;
-        }
-        .mini-palette div {
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          border: 1px solid rgba(255,255,255,0.2);
-        }
       </style>
       <div class="shelf">
         ${sparks.length === 0 ? '<div class="empty">보관된 영감이 없습니다. 마음에 드는 조합을 저장해 보세요!</div>' : 
@@ -111,7 +112,9 @@ class SparkShelf extends HTMLElement {
             <div class="card">
               <button class="delete-btn" data-id="${spark.id}">×</button>
               <div class="card-header">
-                <div class="genre-badge">${spark.genre.toUpperCase()}</div>
+                <div class="genre-badges">
+                  ${(spark.genres || [spark.genre]).map(g => `<span class="genre-badge">${g}</span>`).join('')}
+                </div>
                 <div class="mini-palette">
                   ${spark.colors.map(c => `<div style="background: ${c.oklch}"></div>`).join('')}
                 </div>

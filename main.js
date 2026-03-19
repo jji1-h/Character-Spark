@@ -3,12 +3,12 @@
  */
 
 export const KEYWORD_PACKS = {
-  standard: {
-    label: '기본 (Standard)',
-    job: ['퇴역 군인', '카페 바리스타', '사서', '정원사', '탐정', '고등학교 교사', '프리랜서 디자이너', '건축가'],
-    personality: ['겁이 많은', '냉소적인', '열정적인', '수줍음 많은', '완벽주의적인', '엉뚱한', '낙천적인', '꼼꼼한'],
-    appearance: ['핑크색 머리', '주근깨가 많은', '항상 정장을 입은', '낡은 안경을 쓴', '키가 아주 큰', '화려한 타투', '단정한 단발'],
-    twist: ['요리가 취미', '반전 노래 실력', '사실은 억만장자', '고양이를 무서워함', '밤마다 비밀 일기를 씀', '고전 영화 광'],
+  daily: {
+    label: '일상 (Daily)',
+    job: ['카페 바리스타', '사서', '정원사', '고등학교 교사', '프리랜서 디자이너', '건축가', '편의점 알바생', '사회복지사'],
+    personality: ['평범한', '성실한', '엉뚱한', '낙천적인', '꼼꼼한', '내성적인', '다정다감한', '현실적인'],
+    appearance: ['안경을 쓴', '주근깨가 있는', '항상 후드티를 입은', '단정한 단발', '키가 큰', '운동화가 낡은'],
+    twist: ['요리가 취미', '반전 노래 실력', '밤마다 비밀 일기를 씀', '고전 영화 광', '뜨개질 마스터', '반전 주량'],
   },
   fantasy: {
     label: '판타지 (Fantasy)',
@@ -25,7 +25,7 @@ export const KEYWORD_PACKS = {
     twist: ['인공지능의 자아', '외계인과 공생 중', '시간 여행자', '정부의 비밀 병기', '사실은 복제 인간', '기억이 업로드됨'],
   },
   romance: {
-    label: '현대 로맨스 (Romance)',
+    label: '현대 로슬 (Romance)',
     job: ['재벌 3세', '패션 매거진 에디터', '유명 아이돌', '무명 배우', '수의사', '파티시에', '베스트셀러 작가'],
     personality: ['까칠한', '다정한', '집착하는', '츤데레', '해바라기 같은', '야심찬', '서툰', '순수한'],
     appearance: ['모델 같은 비율', '우수 어린 눈빛', '항상 미소 짓는', '향수 냄새가 좋은', '세련된 스타일', '강아지상'],
@@ -35,25 +35,34 @@ export const KEYWORD_PACKS = {
 
 class CharacterDataService {
   constructor() {
-    this.currentGenre = 'standard';
+    this.selectedGenres = new Set(['daily']);
     this.savedSparks = JSON.parse(localStorage.getItem('mySparks') || '[]');
   }
 
-  setGenre(genre) {
-    if (KEYWORD_PACKS[genre]) {
-      this.currentGenre = genre;
+  toggleGenre(genre) {
+    if (!KEYWORD_PACKS[genre]) return;
+    
+    if (this.selectedGenres.has(genre)) {
+      if (this.selectedGenres.size > 1) {
+        this.selectedGenres.delete(genre);
+      }
+    } else {
+      this.selectedGenres.add(genre);
     }
   }
 
   getRandomKeyword(category) {
-    const pool = KEYWORD_PACKS[this.currentGenre][category];
+    let pool = [];
+    this.selectedGenres.forEach(genre => {
+      pool = pool.concat(KEYWORD_PACKS[genre][category]);
+    });
     return pool[Math.floor(Math.random() * pool.length)];
   }
 
   generateCombination() {
     return {
       id: Date.now(),
-      genre: this.currentGenre,
+      genres: Array.from(this.selectedGenres),
       job: this.getRandomKeyword('job'),
       personality: this.getRandomKeyword('personality'),
       appearance: this.getRandomKeyword('appearance'),
@@ -65,7 +74,6 @@ class CharacterDataService {
 
   generatePalette() {
     const baseHue = Math.floor(Math.random() * 360);
-    // Returning both OKLCH for CSS and Hex for Three.js
     return [
       { oklch: `oklch(70% 0.15 ${baseHue})`, hex: this.hslToHex(baseHue, 70, 60) },
       { oklch: `oklch(60% 0.2 ${(baseHue + 40) % 360})`, hex: this.hslToHex((baseHue + 40) % 360, 80, 50) },
