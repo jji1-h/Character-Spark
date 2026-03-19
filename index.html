@@ -53,6 +53,10 @@
     window.addEventListener('spark-complete', () => {
       document.getElementById('save-btn').disabled = false;
     });
+
+    window.addEventListener('spark-reset', () => {
+      document.getElementById('save-btn').disabled = true;
+    });
   </script>
 </body>
 </html>

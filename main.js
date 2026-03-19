@@ -35,7 +35,8 @@ export const KEYWORD_PACKS = {
 
 class CharacterDataService {
   constructor() {
-    this.selectedGenres = new Set(['daily']);
+    // Default to ALL selected
+    this.selectedGenres = new Set(Object.keys(KEYWORD_PACKS));
     this.savedSparks = JSON.parse(localStorage.getItem('mySparks') || '[]');
   }
 
@@ -43,15 +44,15 @@ class CharacterDataService {
     if (!KEYWORD_PACKS[genre]) return;
     
     if (this.selectedGenres.has(genre)) {
-      if (this.selectedGenres.size > 1) {
-        this.selectedGenres.delete(genre);
-      }
+      this.selectedGenres.delete(genre);
     } else {
       this.selectedGenres.add(genre);
     }
   }
 
   getRandomKeyword(category) {
+    if (this.selectedGenres.size === 0) return '?';
+    
     let pool = [];
     this.selectedGenres.forEach(genre => {
       pool = pool.concat(KEYWORD_PACKS[genre][category]);

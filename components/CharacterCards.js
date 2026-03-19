@@ -16,14 +16,31 @@ class CharacterCards extends HTMLElement {
     this.render();
   }
 
+  showModal(message) {
+    const modal = this.shadowRoot.getElementById('alert-modal');
+    const modalMsg = this.shadowRoot.getElementById('modal-message');
+    modalMsg.textContent = message;
+    modal.classList.add('show');
+  }
+
+  closeModal() {
+    this.shadowRoot.getElementById('alert-modal').classList.remove('show');
+  }
+
   async flipCard(category) {
+    // 1. Check if at least one genre is selected
+    if (dataService.selectedGenres.size === 0) {
+      this.showModal("하나 이상의 장르를 선택해 주세요.");
+      return;
+    }
+
+    // 2. Prevent re-flipping already flipped cards
+    if (this.flippedStates[category]) {
+      return;
+    }
+
     const card = this.shadowRoot.querySelector(`.card[data-cat="${category}"]`);
     const back = card.querySelector('.back');
-    
-    if (this.flippedStates[category]) {
-      card.classList.remove('is-flipped');
-      await new Promise(r => setTimeout(r, 300));
-    }
 
     this.sparkData[category] = dataService.getRandomKeyword(category);
     back.innerHTML = `
@@ -35,6 +52,22 @@ class CharacterCards extends HTMLElement {
     this.flippedStates[category] = true;
 
     this.checkCompletion();
+  }
+
+  async resetAll() {
+    const cards = this.shadowRoot.querySelectorAll('.card');
+    cards.forEach(card => card.classList.remove('is-flipped'));
+
+    // Wait for unflip animation
+    await new Promise(r => setTimeout(r, 600));
+
+    this.sparkData = { job: '?', personality: '?', appearance: '?', twist: '?' };
+    this.flippedStates = { job: false, personality: false, appearance: false, twist: false };
+    this.currentSpark = null;
+
+    // Dispatch event to disable Save button
+    window.dispatchEvent(new CustomEvent('spark-reset'));
+    this.render();
   }
 
   checkCompletion() {
@@ -115,7 +148,6 @@ class CharacterCards extends HTMLElement {
           border: 2px solid #FFD700;
           box-shadow: 0 10px 30px rgba(0,0,0,0.5);
           overflow: hidden;
-          /* Ensure same size by using box-sizing and explicit dimensions if needed */
           box-sizing: border-box;
         }
         .front {
@@ -146,16 +178,75 @@ class CharacterCards extends HTMLElement {
         .icon { font-size: 3.5rem; margin-bottom: 1.5rem; }
         .cat-label { font-weight: 800; letter-spacing: 0.3em; font-size: 0.8rem; }
         
-        .hint {
-          text-align: center;
+        .footer-controls {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 1rem;
           margin-top: 3rem;
+        }
+        .hint {
           font-size: 0.9rem;
           color: #FFD700;
           text-transform: uppercase;
           letter-spacing: 0.2em;
           font-weight: 700;
         }
+        .redraw-btn {
+          background: rgba(255, 215, 0, 0.1);
+          color: #FFD700;
+          border: 1px solid #FFD700;
+          padding: 0.6rem 2rem;
+          border-radius: 2rem;
+          cursor: pointer;
+          font-weight: 800;
+          letter-spacing: 0.1em;
+          transition: all 0.2s;
+        }
+        .redraw-btn:hover {
+          background: #FFD700;
+          color: #25163F;
+        }
+
+        /* Modal Styles */
+        #alert-modal {
+          position: fixed;
+          inset: 0;
+          background: rgba(0,0,0,0.8);
+          display: none;
+          align-items: center;
+          justify-content: center;
+          z-index: 1000;
+          backdrop-filter: blur(5px);
+        }
+        #alert-modal.show { display: flex; }
+        .modal-content {
+          background: #3B167C;
+          border: 2px solid #FFD700;
+          padding: 2.5rem;
+          border-radius: 2rem;
+          text-align: center;
+          max-width: 400px;
+          width: 90%;
+          box-shadow: 0 0 50px rgba(255, 215, 0, 0.3);
+        }
+        .modal-message {
+          color: #FFFFFF;
+          font-weight: 700;
+          margin-bottom: 2rem;
+          font-size: 1.2rem;
+        }
+        .modal-close {
+          background: #FFD700;
+          color: #25163F;
+          border: none;
+          padding: 0.8rem 2rem;
+          border-radius: 1rem;
+          font-weight: 800;
+          cursor: pointer;
+        }
       </style>
+
       <div class="grid">
         ${categories.map(cat => `
           <div class="card-scene" data-id="${cat.id}">
@@ -171,13 +262,32 @@ class CharacterCards extends HTMLElement {
           </div>
         `).join('')}
       </div>
-      <div class="hint">Click each card to reveal your character spark</div>
+
+      <div class="footer-controls">
+        <div class="hint">Click each card to reveal your magical fate</div>
+        <button class="redraw-btn">다시 뽑기 (RESET)</button>
+      </div>
+
+      <div id="alert-modal">
+        <div class="modal-content">
+          <div class="modal-message" id="modal-message">하나 이상의 장르를 선택해 주세요.</div>
+          <button class="modal-close">확인</button>
+        </div>
+      </div>
     `;
 
     this.shadowRoot.querySelectorAll('.card-scene').forEach(scene => {
       scene.addEventListener('click', () => {
         this.flipCard(scene.dataset.id);
       });
+    });
+
+    this.shadowRoot.querySelector('.redraw-btn').addEventListener('click', () => {
+      this.resetAll();
+    });
+
+    this.shadowRoot.querySelector('.modal-close').addEventListener('click', () => {
+      this.closeModal();
     });
   }
 }

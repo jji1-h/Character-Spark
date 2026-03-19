@@ -11,14 +11,10 @@ class GenreSwitcher extends HTMLElement {
   }
 
   toggleAll(checked) {
-    const allGenres = Object.keys(KEYWORD_PACKS);
     if (checked) {
-      allGenres.forEach(g => dataService.selectedGenres.add(g));
+      Object.keys(KEYWORD_PACKS).forEach(g => dataService.selectedGenres.add(g));
     } else {
-      // Keep at least one
-      const first = allGenres[0];
       dataService.selectedGenres.clear();
-      dataService.selectedGenres.add(first);
     }
     this.render();
     window.dispatchEvent(new CustomEvent('genre-changed', { detail: Array.from(dataService.selectedGenres) }));
@@ -134,15 +130,8 @@ class GenreSwitcher extends HTMLElement {
     this.shadowRoot.querySelectorAll('.genre-checkbox').forEach(input => {
       input.addEventListener('change', (e) => {
         const genre = e.target.value;
-        const checked = e.target.checked;
-        
-        if (!checked && dataService.selectedGenres.size === 1) {
-          e.target.checked = true;
-          return;
-        }
-
         dataService.toggleGenre(genre);
-        this.render(); // Re-render to update All Select status
+        this.render(); 
         window.dispatchEvent(new CustomEvent('genre-changed', { detail: Array.from(dataService.selectedGenres) }));
       });
     });
