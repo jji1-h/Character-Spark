@@ -10,10 +10,10 @@ class CharacterCards extends HTMLElement {
     this.flippedStates = {
       job: false, personality: false, appearance: false, twist: false
     };
-    // Track redraw counts per category
     this.redrawCounts = {
       job: 0, personality: 0, appearance: 0, twist: 0
     };
+    this.currentSpark = null;
   }
 
   connectedCallback() {
@@ -40,7 +40,6 @@ class CharacterCards extends HTMLElement {
     const card = this.shadowRoot.querySelector(`.card[data-cat="${category}"]`);
     const back = card.querySelector('.back');
 
-    // Handle Redraw Limit
     if (this.flippedStates[category]) {
       if (this.redrawCounts[category] >= 3) {
         this.showModal("이 카드는 더 이상 다시 뽑을 수 없습니다. (최대 3회)");
@@ -84,7 +83,7 @@ class CharacterCards extends HTMLElement {
     this.redrawCounts = { job: 0, personality: 0, appearance: 0, twist: 0 };
     this.currentSpark = null;
 
-    window.dispatchEvent(new CustomEvent('spark-reset'));
+    this.shadowRoot.querySelector('.save-btn').disabled = true;
     this.render();
   }
 
@@ -98,6 +97,7 @@ class CharacterCards extends HTMLElement {
         timestamp: new Date().toISOString(),
         colors: dataService.generatePalette()
       };
+      this.shadowRoot.querySelector('.save-btn').disabled = false;
       window.dispatchEvent(new CustomEvent('spark-complete', { detail: this.currentSpark }));
     }
   }
@@ -106,6 +106,7 @@ class CharacterCards extends HTMLElement {
     if (this.currentSpark) {
       dataService.saveSpark(this.currentSpark);
       window.dispatchEvent(new CustomEvent('spark-saved'));
+      this.showModal("보관함에 저장되었습니다!");
     }
   }
 
@@ -151,7 +152,6 @@ class CharacterCards extends HTMLElement {
           position: relative;
         }
         
-        /* Intuitive Hover Effect for un-flipped cards */
         .card-scene:hover .card:not(.is-flipped) {
           transform: translateY(-15px) rotateX(10deg);
           box-shadow: 0 20px 40px rgba(255, 215, 0, 0.3);
@@ -195,7 +195,6 @@ class CharacterCards extends HTMLElement {
           position: relative;
         }
         
-        /* Individual Redraw Overlay */
         .redraw-overlay {
           position: absolute;
           inset: 0;
@@ -240,30 +239,67 @@ class CharacterCards extends HTMLElement {
         .icon { font-size: 3.5rem; margin-bottom: 1.5rem; }
         .cat-label { font-weight: 800; letter-spacing: 0.3em; font-size: 0.8rem; }
         
+        /* Footer Button Layout */
         .footer-controls {
           display: flex;
-          flex-direction: column;
+          flex-direction: row;
           align-items: center;
-          gap: 1rem;
+          justify-content: center;
+          gap: 1.5rem;
           margin-top: 4rem;
+          width: 100%;
         }
-        .redraw-btn {
-          background: rgba(255, 215, 0, 0.1);
-          color: #FFD700;
-          border: 1px solid #FFD700;
-          padding: 0.8rem 2.5rem;
-          border-radius: 2rem;
-          cursor: pointer;
+        
+        .control-btn {
+          height: 3.5rem;
+          min-width: 180px;
+          flex: 1;
+          max-width: 280px;
+          border-radius: 3rem;
+          font-size: 1rem;
           font-weight: 800;
-          letter-spacing: 0.15em;
-          transition: all 0.3s;
+          letter-spacing: 0.05em;
+          cursor: pointer;
+          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 0.6rem;
           text-transform: uppercase;
         }
+
+        /* Outline Style for Reset */
+        .redraw-btn {
+          background: transparent;
+          color: #FFD700;
+          border: 2px solid #FFD700;
+        }
         .redraw-btn:hover {
+          background: rgba(255, 215, 0, 0.1);
+          box-shadow: 0 0 20px rgba(255, 215, 0, 0.2);
+          transform: translateY(-2px);
+        }
+
+        /* Solid Style for Save */
+        .save-btn {
           background: #FFD700;
           color: #25163F;
-          box-shadow: 0 0 20px rgba(255, 215, 0, 0.4);
-          transform: translateY(-2px);
+          border: none;
+          box-shadow: 0 10px 25px rgba(255, 215, 0, 0.3);
+        }
+        .save-btn:hover:not(:disabled) {
+          transform: translateY(-2px) scale(1.02);
+          box-shadow: 0 15px 35px rgba(255, 215, 0, 0.4);
+        }
+        .save-btn:disabled {
+          background: rgba(255, 215, 0, 0.15);
+          color: rgba(255, 215, 0, 0.3);
+          box-shadow: none;
+          cursor: not-allowed;
+        }
+
+        .btn-icon {
+          font-size: 1.2rem;
         }
 
         /* Modal Styles */
@@ -327,7 +363,14 @@ class CharacterCards extends HTMLElement {
       </div>
 
       <div class="footer-controls">
-        <button class="redraw-btn">전체 다시 뽑기 (RESET)</button>
+        <button class="control-btn redraw-btn">
+          <span class="btn-icon">↺</span>
+          <span>전체 다시 뽑기</span>
+        </button>
+        <button class="control-btn save-btn" disabled>
+          <span class="btn-icon">★</span>
+          <span>보관하기</span>
+        </button>
       </div>
 
       <div id="alert-modal">
@@ -346,6 +389,10 @@ class CharacterCards extends HTMLElement {
 
     this.shadowRoot.querySelector('.redraw-btn').addEventListener('click', () => {
       this.resetAll();
+    });
+
+    this.shadowRoot.querySelector('.save-btn').addEventListener('click', () => {
+      this.saveCurrent();
     });
 
     this.shadowRoot.querySelector('.modal-close').addEventListener('click', () => {
