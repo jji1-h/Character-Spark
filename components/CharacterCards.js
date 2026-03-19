@@ -4,42 +4,55 @@ class CharacterCards extends HTMLElement {
   constructor() {
     super();
     this.attachShadow({ mode: 'open' });
-    this.currentSpark = null;
-    this.isFlipped = false;
+    this.sparkData = {
+      job: '?', personality: '?', appearance: '?', twist: '?'
+    };
+    this.flippedStates = {
+      job: false, personality: false, appearance: false, twist: false
+    };
   }
 
   connectedCallback() {
     this.render();
   }
 
-  async flipAll() {
-    this.currentSpark = dataService.generateCombination();
-    const cards = this.shadowRoot.querySelectorAll('.card');
+  async flipCard(category) {
+    const card = this.shadowRoot.querySelector(`.card[data-cat="${category}"]`);
+    const back = card.querySelector('.back');
     
-    this.isFlipped = false;
-    cards.forEach(card => card.classList.remove('is-flipped'));
-
-    // Wait for unflip animation
-    await new Promise(r => setTimeout(r, 300));
-
-    // Update back content
-    const categories = ['job', 'personality', 'appearance', 'twist'];
-    categories.forEach((cat, i) => {
-      this.shadowRoot.querySelector(`.back[data-cat="${cat}"]`).textContent = this.currentSpark[cat];
-    });
-
-    // Flip them with sequence
-    for (let i = 0; i < cards.length; i++) {
-      await new Promise(r => setTimeout(r, 150));
-      cards[i].classList.add('is-flipped');
+    // Toggle flip or refresh on already flipped
+    if (this.flippedStates[category]) {
+      card.classList.remove('is-flipped');
+      await new Promise(r => setTimeout(r, 300));
     }
 
-    this.isFlipped = true;
-    window.dispatchEvent(new CustomEvent('spark-complete', { detail: this.currentSpark }));
+    // Get new data for this specific category
+    this.sparkData[category] = dataService.getRandomKeyword(category);
+    back.textContent = this.sparkData[category];
+    
+    card.classList.add('is-flipped');
+    this.flippedStates[category] = true;
+
+    this.checkCompletion();
+  }
+
+  checkCompletion() {
+    const allFlipped = Object.values(this.flippedStates).every(v => v === true);
+    if (allFlipped) {
+      // Create a snapshot for saving
+      this.currentSpark = {
+        id: Date.now(),
+        genres: Array.from(dataService.selectedGenres),
+        ...this.sparkData,
+        timestamp: new Date().toISOString(),
+        colors: dataService.generatePalette() // Keep palette for stored data consistency
+      };
+      window.dispatchEvent(new CustomEvent('spark-complete', { detail: this.currentSpark }));
+    }
   }
 
   saveCurrent() {
-    if (this.currentSpark && this.isFlipped) {
+    if (this.currentSpark) {
       dataService.saveSpark(this.currentSpark);
       window.dispatchEvent(new CustomEvent('spark-saved'));
     }
@@ -59,12 +72,12 @@ class CharacterCards extends HTMLElement {
         .grid {
           display: grid;
           grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-          gap: 1.5rem;
-          perspective: 1000px;
-          cursor: pointer;
+          gap: 2rem;
+          perspective: 1500px;
         }
         .card-scene {
-          height: 250px;
+          height: 300px;
+          cursor: pointer;
         }
         .card {
           width: 100%;
@@ -85,54 +98,62 @@ class CharacterCards extends HTMLElement {
           flex-direction: column;
           align-items: center;
           justify-content: center;
-          border-radius: 1.5rem;
-          border: 2px solid oklch(35% 0.04 250);
-          box-shadow: 0 15px 35px -5px rgba(0,0,0,0.5);
+          border-radius: 2rem;
+          border: 2px solid oklch(30% 0.04 250);
+          box-shadow: 0 20px 40px -10px rgba(0,0,0,0.6);
+          transition: border-color 0.3s;
+        }
+        .card:hover .face {
+          border-color: var(--accent-color);
         }
         .front {
-          background: oklch(25% 0.03 250);
+          background: linear-gradient(145deg, oklch(25% 0.03 250), oklch(20% 0.02 250));
           color: oklch(70% 0.05 250);
         }
         .back {
-          background: oklch(85% 0.1 250);
+          background: oklch(95% 0.01 250);
           color: oklch(15% 0.02 250);
           transform: rotateY(180deg);
-          padding: 1.5rem;
+          padding: 2rem;
           text-align: center;
-          font-weight: 800;
-          font-size: 1.2rem;
+          font-weight: 900;
+          font-size: 1.4rem;
           border: none;
+          line-height: 1.3;
         }
-        .icon { font-size: 2.5rem; margin-bottom: 1rem; opacity: 0.5; }
-        .cat-label { font-weight: 900; letter-spacing: 0.2em; font-size: 0.8rem; }
+        .icon { font-size: 3rem; margin-bottom: 1.5rem; opacity: 0.8; filter: drop-shadow(0 0 10px var(--accent-glow)); }
+        .cat-label { font-weight: 900; letter-spacing: 0.3em; font-size: 0.85rem; opacity: 0.7; }
         
         .hint {
           text-align: center;
-          margin-top: 1.5rem;
-          font-size: 0.8rem;
+          margin-top: 2.5rem;
+          font-size: 0.9rem;
           color: oklch(60% 0.05 250);
           font-weight: 600;
-          letter-spacing: 0.1em;
+          letter-spacing: 0.15em;
+          text-transform: uppercase;
         }
       </style>
       <div class="grid">
         ${categories.map(cat => `
-          <div class="card-scene">
-            <div class="card">
+          <div class="card-scene" data-id="${cat.id}">
+            <div class="card" data-cat="${cat.id}">
               <div class="face front">
                 <div class="icon">${cat.icon}</div>
                 <div class="cat-label">${cat.label}</div>
               </div>
-              <div class="face back" data-cat="${cat.id}">?</div>
+              <div class="face back">?</div>
             </div>
           </div>
         `).join('')}
       </div>
-      <div class="hint">CLICK CARDS TO SPARK! (카드를 클릭해 영감을 얻으세요)</div>
+      <div class="hint">Tap individual cards to reveal your character spark</div>
     `;
 
-    this.shadowRoot.querySelector('.grid').addEventListener('click', () => {
-      this.flipAll();
+    this.shadowRoot.querySelectorAll('.card-scene').forEach(scene => {
+      scene.addEventListener('click', () => {
+        this.flipCard(scene.dataset.id);
+      });
     });
   }
 }
