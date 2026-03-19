@@ -62,14 +62,22 @@ class CharacterCards extends HTMLElement {
 
   updateCardBack(category, backElement) {
     const count = this.redrawCounts[category];
-    backElement.innerHTML = `
+    const labelMap = {
+      job: '직업',
+      personality: '성격',
+      appearance: '외모특성',
+      twist: '반전매력'
+    };
+
+    back.innerHTML = `
       <div class="redraw-overlay">
         <div>이 카드만 다시 뽑기</div>
         <div class="redraw-count">(${count}/3)</div>
       </div>
       <div class="result-text">${this.sparkData[category]}</div>
-      <div class="card-footer">${category.toUpperCase()}</div>
+      <div class="card-footer">${labelMap[category]}</div>
     `;
+
   }
 
   async resetAll() {
@@ -112,10 +120,10 @@ class CharacterCards extends HTMLElement {
 
   render() {
     const categories = [
-      { id: 'job', label: 'JOB', icon: '✦' },
-      { id: 'personality', label: 'SOUL', icon: '✧' },
-      { id: 'appearance', label: 'FORM', icon: '❂' },
-      { id: 'twist', label: 'FATE', icon: '✵' }
+      { id: 'job', label: '직업', icon: '✦' },
+      { id: 'personality', label: '성격', icon: '✧' },
+      { id: 'appearance', label: '외모특성', icon: '❂' },
+      { id: 'twist', label: '반전매력', icon: '✵' }
     ];
 
     this.shadowRoot.innerHTML = `

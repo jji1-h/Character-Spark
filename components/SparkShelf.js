@@ -115,10 +115,10 @@ class SparkShelf extends HTMLElement {
                 </div>
               </div>
               <div class="keywords">
-                <div class="kw"><span>SOUL</span>${spark.personality}</div>
-                <div class="kw"><span>JOB</span>${spark.job}</div>
-                <div class="kw"><span>FORM</span>${spark.appearance}</div>
-                <div class="kw"><span>FATE</span>${spark.twist}</div>
+                <div class="kw"><span>성격</span>${spark.personality}</div>
+                <div class="kw"><span>직업</span>${spark.job}</div>
+                <div class="kw"><span>외모특성</span>${spark.appearance}</div>
+                <div class="kw"><span>반전매력</span>${spark.twist}</div>
               </div>
             </div>
           `).join('')
