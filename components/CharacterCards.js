@@ -28,22 +28,23 @@ class CharacterCards extends HTMLElement {
   }
 
   async flipCard(category) {
-    // 1. Check if at least one genre is selected
     if (dataService.selectedGenres.size === 0) {
       this.showModal("하나 이상의 장르를 선택해 주세요.");
-      return;
-    }
-
-    // 2. Prevent re-flipping already flipped cards
-    if (this.flippedStates[category]) {
       return;
     }
 
     const card = this.shadowRoot.querySelector(`.card[data-cat="${category}"]`);
     const back = card.querySelector('.back');
 
+    // If already flipped, this is a 'redraw single' action
+    if (this.flippedStates[category]) {
+      card.classList.remove('is-flipped');
+      await new Promise(r => setTimeout(r, 400));
+    }
+
     this.sparkData[category] = dataService.getRandomKeyword(category);
     back.innerHTML = `
+      <div class="redraw-overlay">이 카드만 다시 뽑기</div>
       <div class="result-text">${this.sparkData[category]}</div>
       <div class="card-footer">${category.toUpperCase()}</div>
     `;
@@ -58,14 +59,12 @@ class CharacterCards extends HTMLElement {
     const cards = this.shadowRoot.querySelectorAll('.card');
     cards.forEach(card => card.classList.remove('is-flipped'));
 
-    // Wait for unflip animation
     await new Promise(r => setTimeout(r, 600));
 
     this.sparkData = { job: '?', personality: '?', appearance: '?', twist: '?' };
     this.flippedStates = { job: false, personality: false, appearance: false, twist: false };
     this.currentSpark = null;
 
-    // Dispatch event to disable Save button
     window.dispatchEvent(new CustomEvent('spark-reset'));
     this.render();
   }
@@ -160,7 +159,30 @@ class CharacterCards extends HTMLElement {
           transform: rotateY(180deg);
           padding: 1.5rem;
           text-align: center;
+          position: relative;
         }
+        
+        /* Individual Redraw Overlay */
+        .redraw-overlay {
+          position: absolute;
+          inset: 0;
+          background: rgba(37, 22, 63, 0.9);
+          color: #FFD700;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 800;
+          font-size: 0.9rem;
+          opacity: 0;
+          transition: opacity 0.2s;
+          z-index: 10;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+        }
+        .back:hover .redraw-overlay {
+          opacity: 1;
+        }
+
         .result-text {
           font-weight: 800;
           font-size: clamp(1.1rem, 2vw, 1.4rem);
@@ -256,6 +278,7 @@ class CharacterCards extends HTMLElement {
                 <div class="cat-label">${cat.label}</div>
               </div>
               <div class="face back" data-cat="${cat.id}">
+                <div class="redraw-overlay">이 카드만 다시 뽑기</div>
                 <div class="result-text">?</div>
               </div>
             </div>
@@ -265,7 +288,7 @@ class CharacterCards extends HTMLElement {
 
       <div class="footer-controls">
         <div class="hint">Click each card to reveal your magical fate</div>
-        <button class="redraw-btn">다시 뽑기 (RESET)</button>
+        <button class="redraw-btn">전체 다시 뽑기 (RESET)</button>
       </div>
 
       <div id="alert-modal">
