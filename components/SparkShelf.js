@@ -24,40 +24,41 @@ class SparkShelf extends HTMLElement {
         .shelf {
           display: grid;
           grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-          gap: 1.5rem;
+          gap: 2rem;
           margin-top: 1rem;
         }
         .card {
-          background: oklch(25% 0.03 250);
-          border: 1px solid oklch(35% 0.04 250);
-          border-radius: 1.2rem;
+          background: rgba(255, 255, 255, 0.95);
+          color: #25163F;
+          border-radius: 1rem;
           padding: 1.5rem;
           position: relative;
-          transition: transform 0.2s;
+          transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
           display: flex;
           flex-direction: column;
-          gap: 0.8rem;
-          box-shadow: 0 10px 30px -10px black;
+          gap: 1rem;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+          border: 2px solid #FFD700;
         }
-        .card:hover { transform: translateY(-5px); }
+        .card:hover { transform: translateY(-8px) scale(1.02); }
         .delete-btn {
           position: absolute;
           top: 0.5rem;
           right: 0.5rem;
           background: transparent;
           border: none;
-          color: oklch(50% 0.1 20);
+          color: rgba(37, 22, 63, 0.3);
           cursor: pointer;
-          font-size: 1.2rem;
-          padding: 0.5rem;
-          line-height: 1;
+          font-size: 1.5rem;
+          transition: color 0.2s;
         }
+        .delete-btn:hover { color: #ff4444; }
         .card-header {
           display: flex;
           justify-content: space-between;
-          align-items: flex-start;
-          margin-bottom: 0.5rem;
-          gap: 0.5rem;
+          align-items: center;
+          border-bottom: 1px solid rgba(37, 22, 63, 0.1);
+          padding-bottom: 0.5rem;
         }
         .genre-badges {
           display: flex;
@@ -65,49 +66,46 @@ class SparkShelf extends HTMLElement {
           gap: 0.3rem;
         }
         .genre-badge {
-          font-size: 0.55rem;
-          background: oklch(40% 0.05 250);
-          padding: 0.15rem 0.4rem;
-          border-radius: 0.3rem;
+          font-size: 0.6rem;
+          background: #3B167C;
+          padding: 0.2rem 0.5rem;
+          border-radius: 2rem;
           text-transform: uppercase;
-          color: oklch(90% 0.01 250);
-        }
-        .mini-palette {
-          display: flex;
-          gap: 3px;
-        }
-        .mini-palette div {
-          width: 10px;
-          height: 10px;
-          border-radius: 50%;
-          border: 1px solid rgba(255,255,255,0.2);
+          color: #FFD700;
+          font-weight: 800;
         }
         .keywords {
           display: flex;
           flex-direction: column;
-          gap: 0.4rem;
+          gap: 0.6rem;
+          font-family: 'Georgia', serif;
         }
         .kw {
-          font-weight: 700;
+          font-weight: 900;
           font-size: 1.1rem;
-          color: oklch(90% 0.02 250);
         }
         .kw span {
-          font-size: 0.7rem;
-          color: oklch(60% 0.1 250);
-          margin-right: 0.5rem;
+          font-size: 0.65rem;
+          color: rgba(37, 22, 63, 0.5);
+          margin-right: 0.8rem;
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
+          display: inline-block;
+          width: 50px;
         }
         .empty {
           grid-column: 1 / -1;
           text-align: center;
-          padding: 3rem;
-          color: oklch(50% 0.02 250);
-          border: 2px dashed oklch(30% 0.02 250);
-          border-radius: 1rem;
+          padding: 5rem;
+          color: rgba(255, 255, 255, 0.5);
+          border: 2px dashed rgba(255, 215, 0, 0.3);
+          border-radius: 2rem;
+          text-transform: uppercase;
+          letter-spacing: 0.3em;
         }
       </style>
       <div class="shelf">
-        ${sparks.length === 0 ? '<div class="empty">보관된 영감이 없습니다. 마음에 드는 조합을 저장해 보세요!</div>' : 
+        ${sparks.length === 0 ? '<div class="empty">The archives are empty. Find your spark.</div>' : 
           sparks.map(spark => `
             <div class="card">
               <button class="delete-btn" data-id="${spark.id}">×</button>
@@ -115,15 +113,12 @@ class SparkShelf extends HTMLElement {
                 <div class="genre-badges">
                   ${(spark.genres || [spark.genre]).map(g => `<span class="genre-badge">${g}</span>`).join('')}
                 </div>
-                <div class="mini-palette">
-                  ${spark.colors.map(c => `<div style="background: ${c.oklch}"></div>`).join('')}
-                </div>
               </div>
               <div class="keywords">
-                <div class="kw"><span>성격</span>${spark.personality}</div>
-                <div class="kw"><span>직업</span>${spark.job}</div>
-                <div class="kw"><span>외양</span>${spark.appearance}</div>
-                <div class="kw"><span>반전</span>${spark.twist}</div>
+                <div class="kw"><span>SOUL</span>${spark.personality}</div>
+                <div class="kw"><span>JOB</span>${spark.job}</div>
+                <div class="kw"><span>FORM</span>${spark.appearance}</div>
+                <div class="kw"><span>FATE</span>${spark.twist}</div>
               </div>
             </div>
           `).join('')

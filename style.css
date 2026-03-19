@@ -2,13 +2,14 @@
 
 @layer base {
   :root {
-    --bg-color: oklch(12% 0.02 250);
-    --text-color: oklch(98% 0.01 250);
+    --bg-color-start: #25163F;
+    --bg-color-end: #3B167C;
+    --text-color: #FFFFFF;
     --accent-color: #FFD700;
-    --accent-glow: rgba(255, 215, 0, 0.4);
+    --accent-glow: rgba(255, 215, 0, 0.5);
     --secondary-color: #FFA500;
-    --surface-color: oklch(18% 0.03 250);
-    --border-color: oklch(25% 0.04 250);
+    --surface-color: rgba(37, 22, 63, 0.7);
+    --border-color: rgba(255, 215, 0, 0.2);
     
     --font-main: 'Inter', system-ui, -apple-system, sans-serif;
   }
@@ -20,14 +21,13 @@
   }
 
   body {
-    background-color: var(--bg-color);
+    background: linear-gradient(135deg, var(--bg-color-start), var(--bg-color-end));
+    background-attachment: fixed;
     color: var(--text-color);
     font-family: var(--font-main);
     line-height: 1.6;
     overflow-x: hidden;
-    background-image: 
-      radial-gradient(circle at 50% 0%, oklch(25% 0.08 250 / 0.4), transparent 70%);
-    background-attachment: fixed;
+    min-height: 100vh;
   }
 
   h1, h2, h3 {
@@ -38,13 +38,12 @@
 
 @layer layout {
   #app {
-    max-width: 1000px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 2rem;
     display: flex;
     flex-direction: column;
     gap: 4rem;
-    min-height: 100vh;
   }
 
   header {
@@ -55,20 +54,19 @@
   header h1 {
     font-size: clamp(2.5rem, 8vw, 4rem);
     text-transform: uppercase;
-    letter-spacing: -0.06em;
+    letter-spacing: 0.1em;
     margin-bottom: 0.5rem;
-    background: linear-gradient(135deg, var(--text-color), var(--accent-color));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    color: var(--accent-color);
+    text-shadow: 0 0 20px var(--accent-glow);
   }
 
   header h1 span {
     display: block;
     font-size: 0.35em;
     font-weight: 500;
-    letter-spacing: 0.3em;
-    -webkit-text-fill-color: var(--text-color);
-    opacity: 0.6;
+    letter-spacing: 0.5em;
+    color: var(--text-color);
+    opacity: 0.8;
     margin-top: 0.5rem;
   }
 
@@ -85,7 +83,6 @@
     flex-direction: column;
     gap: 3rem;
     width: 100%;
-    max-width: 800px;
   }
 
   .storage-area {
@@ -99,15 +96,15 @@
     margin-bottom: 2rem;
     font-size: 1.5rem;
     text-transform: uppercase;
-    letter-spacing: 0.2em;
-    color: oklch(60% 0.05 250);
+    letter-spacing: 0.3em;
+    color: var(--accent-color);
   }
 }
 
 @layer components {
   .primary-btn {
     background: var(--accent-color);
-    color: var(--bg-color);
+    color: #25163F;
     border: none;
     padding: 1.2rem 4rem;
     font-size: 1.2rem;
@@ -115,21 +112,20 @@
     border-radius: 3rem;
     cursor: pointer;
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: 0 10px 30px var(--accent-glow);
+    box-shadow: 0 0 30px var(--accent-glow);
     text-transform: uppercase;
     letter-spacing: 0.2em;
   }
 
   .primary-btn:hover:not(:disabled) {
-    transform: translateY(-4px) scale(1.02);
-    box-shadow: 0 20px 40px var(--accent-glow);
+    transform: translateY(-4px) scale(1.05);
+    box-shadow: 0 0 50px var(--accent-glow);
   }
 
   .primary-btn:disabled {
-    opacity: 0.15;
+    opacity: 0.2;
     cursor: not-allowed;
     box-shadow: none;
-    filter: grayscale(1);
   }
 
   .action-buttons {

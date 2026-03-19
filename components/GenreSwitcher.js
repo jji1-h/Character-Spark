@@ -19,68 +19,69 @@ class GenreSwitcher extends HTMLElement {
           flex-direction: column;
           gap: 1.5rem;
           align-items: center;
-          background: oklch(15% 0.02 250);
+          background: rgba(37, 22, 63, 0.4);
           padding: 2rem;
           border-radius: 2rem;
-          border: 1px solid oklch(25% 0.04 250);
+          border: 1px solid rgba(255, 215, 0, 0.2);
+          backdrop-filter: blur(10px);
         }
         .label {
           font-size: 0.9rem;
-          color: oklch(70% 0.05 250);
+          color: #FFD700;
           font-weight: 800;
           text-transform: uppercase;
-          letter-spacing: 0.2em;
+          letter-spacing: 0.4em;
+          text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
         }
         .options {
           display: flex;
-          gap: 2rem;
+          gap: 2.5rem;
           flex-wrap: wrap;
           justify-content: center;
         }
         .option {
           display: flex;
           align-items: center;
-          gap: 0.8rem;
+          gap: 1rem;
           cursor: pointer;
-          font-weight: 600;
-          color: oklch(80% 0.02 250);
-          transition: color 0.2s;
+          font-weight: 700;
+          color: rgba(255, 255, 255, 0.8);
+          transition: all 0.3s;
           user-select: none;
+          letter-spacing: 0.1em;
         }
         .option:hover {
-          color: var(--accent-color);
+          color: #FFD700;
+          text-shadow: 0 0 10px rgba(255, 215, 0, 0.3);
         }
         input[type="checkbox"] {
           appearance: none;
-          width: 1.5rem;
-          height: 1.5rem;
-          border: 2px solid oklch(40% 0.05 250);
-          border-radius: 0.4rem;
+          width: 1.2rem;
+          height: 1.2rem;
+          border: 2px solid rgba(255, 215, 0, 0.4);
+          border-radius: 50%;
           background: transparent;
           cursor: pointer;
           position: relative;
-          transition: all 0.2s;
+          transition: all 0.3s;
         }
         input[type="checkbox"]:checked {
-          background: var(--accent-color);
-          border-color: var(--accent-color);
+          background: #FFD700;
+          border-color: #FFD700;
+          box-shadow: 0 0 15px #FFD700;
         }
         input[type="checkbox"]:checked::after {
-          content: '✓';
+          content: '✦';
           position: absolute;
           top: 50%;
           left: 50%;
           transform: translate(-50%, -50%);
-          color: oklch(15% 0.02 250);
-          font-size: 1rem;
-          font-weight: 900;
-        }
-        input[type="checkbox"]:hover {
-          border-color: var(--accent-color);
+          color: #25163F;
+          font-size: 0.7rem;
         }
       </style>
       <div class="switcher-container">
-        <div class="label">장르 필터</div>
+        <div class="label">Magic Realm</div>
         <div class="options">
           ${genres.map(([key, pack]) => `
             <label class="option">
